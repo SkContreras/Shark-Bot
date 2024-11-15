@@ -10,7 +10,7 @@ import re
 from urllib.parse import urlparse, parse_qs
 
 # Configuración del bot
-TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+TOKEN = 'MTMwNDgzNjgxOTY1MjcwNjMxNA.GuXF64.yH07gP-nhlRuv1jy0cBC0BgT2R1LvAXGJzHm70'
 SPOTIFY_CLIENT_ID = '92f72b2bc1024c88bec00469140f4ad4'
 SPOTIFY_CLIENT_SECRET = '2aea17e528044bbe90e4d8cb3125cfe3'
 
