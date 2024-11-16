@@ -8,12 +8,9 @@ import asyncio
 import shutil
 import re
 from urllib.parse import urlparse, parse_qs
+from flask import Flask
 
-const express = require('express');
-const app = express();
-
-// Usa la variable de entorno PORT que Render proporciona, o usa el puerto 4000 por defecto
-const port = process.env.PORT || 4000;
+app.run(host='0.0.0.0', port=5000)
 
 # Configuración del bot
 TOKEN = os.getenv('DISCORD_TOKEN')
