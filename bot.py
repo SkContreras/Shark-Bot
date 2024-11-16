@@ -10,6 +10,14 @@ import re
 from urllib.parse import urlparse, parse_qs
 from flask import Flask
 
+
+# Inicializamos Flask
+app = Flask(__name__)
+
+# Rutas de Flask
+@app.route('/')
+def index():
+    return 'Servidor Flask en funcionamiento'
 app.run(host='0.0.0.0', port=5000)
 
 # Configuración del bot
