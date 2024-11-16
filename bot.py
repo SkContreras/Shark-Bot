@@ -9,6 +9,12 @@ import shutil
 import re
 from urllib.parse import urlparse, parse_qs
 
+const express = require('express');
+const app = express();
+
+// Usa la variable de entorno PORT que Render proporciona, o usa el puerto 4000 por defecto
+const port = process.env.PORT || 4000;
+
 # Configuración del bot
 TOKEN = os.getenv('DISCORD_TOKEN')
 SPOTIFY_CLIENT_ID = '92f72b2bc1024c88bec00469140f4ad4'
