@@ -8,22 +8,14 @@ import asyncio
 import shutil
 import re
 from urllib.parse import urlparse, parse_qs
-from flask import Flask
+from decouple import Config, RepositoryEnv
 
+# Especifica la ruta al archivo .env
+config = Config(RepositoryEnv('C:/Users/pc/Documents/PROGRAMACION/GAMES/discord/shark_bot/venv/.env'))
 
-# Inicializamos Flask
-app = Flask(__name__)
-
-# Rutas de Flask
-@app.route('/')
-def index():
-    return 'Servidor Flask en funcionamiento'
-app.run(host='0.0.0.0', port=5000)
-
-# Configuración del bot
-TOKEN = os.getenv('DISCORD_TOKEN')
-SPOTIFY_CLIENT_ID = '92f72b2bc1024c88bec00469140f4ad4'
-SPOTIFY_CLIENT_SECRET = '2aea17e528044bbe90e4d8cb3125cfe3'
+TOKEN = config('DISCORD_TOKEN')
+SPOTIFY_CLIENT_ID = config('CLIENT_ID')
+SPOTIFY_CLIENT_SECRET = config('CLIENT_SECRET')
 
 spotify = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=SPOTIFY_CLIENT_ID, client_secret=SPOTIFY_CLIENT_SECRET))
 
