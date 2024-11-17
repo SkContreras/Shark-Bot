@@ -8,10 +8,7 @@ import asyncio
 import shutil
 import re
 from urllib.parse import urlparse, parse_qs
-from decouple import Config, RepositoryEnv
-
-# Especifica la ruta al archivo .env
-config = Config(RepositoryEnv('C:/Users/pc/Documents/PROGRAMACION/GAMES/discord/shark_bot/venv/.env'))
+from decouple import Config
 
 TOKEN = config('DISCORD_TOKEN')
 SPOTIFY_CLIENT_ID = config('CLIENT_ID')
