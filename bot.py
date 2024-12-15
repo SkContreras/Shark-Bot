@@ -8,7 +8,7 @@ import asyncio
 import shutil
 import re
 from urllib.parse import urlparse, parse_qs
-from decouple import Config
+from decouple import config
 
 TOKEN = config('DISCORD_TOKEN')
 SPOTIFY_CLIENT_ID = config('CLIENT_ID')
@@ -60,7 +60,6 @@ ytdl_opts = {
     'cachedir': 'C:/path/to/cache'  # Cambia a la ruta de la carpeta de caché en tu sistema
 }
 
-
 # Opciones de FFmpeg
 ffmpeg_options = {
     'executable': 'C:/ffmpeg/bin/ffmpeg.exe',  # Asegúrate de que la ruta a ffmpeg es correcta
@@ -68,10 +67,8 @@ ffmpeg_options = {
     'options': '-vn -loglevel debug -probesize 10000000 -analyzeduration 20000000',  # Aumentando probesize y analyzeduration
 }
 
-
 ytdl = yt_dlp.YoutubeDL(ytdl_opts)
 queue = []  # Cola global para las canciones
-
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, volume=0.5):
@@ -148,14 +145,17 @@ async def search_media(query):
     # Si es una canción de Spotify
     elif match_spotify_track:
         print("El enlace es una canción de Spotify")
+        query = clean_spotify_url(query)
         try:
             track_info = await get_spotify_track_info(query)
             track_name = track_info['name']
             artist_name = track_info['artists'][0]['name']
-            return await search_in_youtube(f"{track_name} de {artist_name}")
+            query = str(f"{track_name} de {artist_name}")
+            print(f"Búsqueda en YouTube: {query}")
+            return await search_in_youtube(query)
         except Exception as e:
-            print(f"Error accediendo a Spotify: {e}")
-            return await search_in_youtube(query)  # Si ocurre un error, buscar en YouTube
+            return await fallback_to_youtube(query, f"Error accediendo a Spotify: {e}")
+
 
     # Si es una lista de reproducción de Spotify
     elif match_spotify_playlist_url:
@@ -175,8 +175,6 @@ async def search_media(query):
     else:
         # Primero, buscar en YouTube
         return await search_in_youtube(query)
-
-
 
 # Función para extraer los enlaces de la lista de reproducción usando yt_dlp
 def extract_playlist_links(playlist_url):
@@ -203,6 +201,16 @@ def extract_playlist_links(playlist_url):
         else:
             return []
 
+async def fallback_to_youtube(query, error_message=None):
+    if error_message:
+        print(error_message)
+    return await search_in_youtube(query)
+
+def clean_spotify_url(url):
+    match = re.search(r"track/([A-Za-z0-9_-]+)", url)
+    if match:
+        return f"https://open.spotify.com/track/{match.group(1)}"
+    raise ValueError("URL de Spotify no válida")
 
 async def search_in_youtube(query):
     # Crear opciones para yt-dlp
@@ -224,7 +232,6 @@ async def search_in_youtube(query):
             return video_url
         else:
             return "No se encontraron resultados."
-
 
 async def play_queue(ctx, volume):
     print("Iniciando función play_queue")
@@ -288,13 +295,11 @@ async def play_queue(ctx, volume):
         if queue:
             await play_queue(ctx, volume)
 
-
 # Función para obtener información de la canción
 async def get_spotify_track_info(url):
     track_id = url.split('/')[-1]  # Obtiene el ID de la canción de la URL
     track_info = spotify.track(track_id)
     return track_info
-
 
 # Función para reproducir desde Spotify
 async def play_spotify(ctx, url, volume):
@@ -316,8 +321,7 @@ async def play_spotify(ctx, url, volume):
     except Exception as e:
         print(f"Error al reproducir desde Spotify: {e}")
 
-
-async def next_song(ctx, volume):
+async def play_next(ctx, volume):
     # Función auxiliar para continuar con la siguiente canción en la cola
     if queue:
         await play_queue(ctx, volume)
@@ -384,7 +388,6 @@ async def volume(ctx, volume: float):
     else:
         await ctx.send("El volumen debe estar entre 0 y 1.")
 
-
 @bot.command()
 async def lol(ctx):
     if ctx.author.voice is None:
@@ -416,7 +419,6 @@ async def lol(ctx):
             await ctx.send("Ya estoy reproduciendo música. Las canciones se han añadido a la cola. 🎶")
     else:
         await ctx.send("No se pudo encontrar ningún video. 😔")
-
 
 @bot.command(name='leave', help='Deja el canal de voz')
 async def leave(ctx):
